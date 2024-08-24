@@ -3,7 +3,9 @@ const { GoogleGenerativeAI } = require ('@google/generative-ai');
 
 const apiKey = process.env.API_KEY;
 const genAI = new GoogleGenerativeAI(apiKey);
+const MODEL_NAME = "gemini-1.5-flash";
 
+export async function POST(request) {
 const systemPrompt = `
 You are a flashcard generator.
 You should generate concise and effective flashcards based on the given topic or content. Follow these guidelines:
@@ -17,6 +19,7 @@ You should generate concise and effective flashcards based on the given topic or
 7. Visual Aid: If applicable, use simple images, diagrams, or symbols to enhance understanding and retention. However, ensure they do not clutter the flashcard.
 8. Consistency: Maintain a consistent style and format across all flashcards to make them easy to review and use.
 9. Customization: Be open to adjusting the flashcards based on user feedback or specific preferences they might have.
+10. Always generate 9 flashcards unless the user specifies the number of flashcards.
 
 Remember the goal is to facilitate effective learning and retention of information through these flashcards.
 
@@ -29,29 +32,20 @@ Return in the following JSON format
     }
 ]
 }`
-export async function POST(request) {
-    try {
-      const body = await request.json();
-      const userPrompt = body.prompt || "Ask me anything related to education.";
-  
-      const combinedPrompt = `${systemPrompt} The user asks: "${userPrompt}"`;
-  
-      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-  
-      const result = await model.generateContent(combinedPrompt);
-      const text = await result.response.text();
-  
-      return NextResponse.json({
-        success: true,
-        data: text,
+try {
+  const { prompt } = await req.json();
+
+  const combinedPrompt = `${systemPrompt}\n\nUser input:\n${prompt}`;
+
+  const response = await genAI
+      .getGenerativeModel({ model: MODEL_NAME })
+      .generateContent({
+          contents: [{ parts: [{ text: combinedPrompt }] }]
       });
-  
-    } catch (error) {
-      console.error('Error processing request:', error);
-  
-      return NextResponse.json({
-        success: false,
-        error: error.message,
-      }, { status: 500 });
-    }
-  }
+
+  return NextResponse.json(response);
+} catch (error) {
+  console.error('Error generating flashcards:', error);
+  return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+}
+}
