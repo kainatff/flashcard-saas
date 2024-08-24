@@ -44,17 +44,11 @@ const pricingPlans = [
     description: 'Advanced features for avid learners.',
     features: ['Unlimited flashcards', 'Advanced analytics', 'AI-powered study plans', 'Priority support'],
   },
-  {
-    title: 'Enterprise Plan',
-    price: 'Contact Us',
-    description: 'Tailored solutions for organizations and teams.',
-    features: ['Custom features', 'Dedicated support', 'Team management', 'Advanced AI integrations'],
-  },
 ];
 
 const FeatureSection = () => {
   return (
-    <Grid container spacing={4}>
+    <Grid container spacing={4} sx={{ mt: 4 }}>
       {features.map((feature, index) => (
         <Grid item xs={12} sm={6} md={4} key={index}>
           <Card sx={{ maxWidth: 345 }}>
@@ -81,7 +75,7 @@ const FeatureSection = () => {
 
 const PricingSection = () => {
   return (
-    <Grid container spacing={4} justifyContent="center">
+    <Grid container spacing={4} justifyContent="center" sx={{ mt: 4 }}>
       {pricingPlans.map((plan, index) => (
         <Grid item xs={12} sm={6} md={4} key={index}>
           <Card sx={{ maxWidth: 345, textAlign: 'center' }}>
@@ -148,14 +142,14 @@ export default function Home() {
           Learn More
         </Button>
       </Box>
-      <Box sx={{ my: 10, textAlign: 'center' }}>
+      <Box sx={{ my: 8, textAlign: 'center' }}>
         <Typography variant="h4" component="h2" gutterBottom>
           Features
         </Typography>
         {/* Use the FeatureSection component here */}
         <FeatureSection />
       </Box>
-      <Box sx={{ my: 10, textAlign: 'center' }}>
+      <Box sx={{ my: 8, textAlign: 'center' }}>
         <Typography variant="h4" component="h2" gutterBottom>
           Pricing
         </Typography>
