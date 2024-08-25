@@ -170,14 +170,14 @@ export default function Home() {
             Get Started
           </Button>
         </Box>
-        <Box sx={{ my: 6, textAlign: 'center' }}>
+        <Box sx={{ my: 4, textAlign: 'center' }}>
           <Typography variant="h4" component="h2" gutterBottom>
             Features
           </Typography>
           <FeatureSection />
         </Box>
-        <Box sx={{ my: 6, textAlign: 'center' }}>
-          <Typography variant="h4" component="h2" gutterBottom>
+        <Box sx={{ my: 4, textAlign: 'center' }}>
+          <Typography variant="h4" component="h2" gutterBottom >
             Pricing
           </Typography>
           <PricingSection />

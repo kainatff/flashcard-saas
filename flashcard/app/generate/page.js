@@ -6,29 +6,28 @@ import { doc, collection, setDoc, getDoc, writeBatch } from "firebase/firestore"
 import { db } from "@/firebase";
 import { Box, Button, Card, CardActionArea, CardContent, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, Paper, TextField, Typography, createTheme, ThemeProvider } from "@mui/material";
 
-// Define your custom color palette theme
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#000000', // --black
+      main: '#000000', 
     },
     secondary: {
-      main: '#001a2a', // --rich-black-3
+      main: '#001a2a', 
     },
     text: {
-      primary: '#000d15', // --rich-black
-      secondary: '#334753', // --charcoal
+      primary: '#000d15', 
+      secondary: '#334753', 
     },
     background: {
-      default: '#65747b', // --paynes-gray-2
+      default: '#65747b', 
     },
   },
   typography: {
     h4: {
-      color: '#000d15', // --rich-black
+      color: '#000d15', 
     },
     h5: {
-      color: '#334753', // --charcoal
+      color: '#334753', 
     },
   },
 });
@@ -102,9 +101,9 @@ export default function Generate() {
 
   return (
     <ThemeProvider theme={theme}>
-      <Container maxWidth="false" sx={{ bgcolor: '#65747b', minHeight: '130vh' }}>
+      <Container maxWidth="false" sx={{ bgcolor: '#65747b', minHeight: "false", }}>
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <Typography variant="h4" sx={{ color: '#000d15' }}>Generate Flashcards</Typography>
+          <Typography variant="h4" sx={{ color: '#000d15', mt: 4 }}>Generate Flashcards</Typography>
           <Paper sx={{ p: 4, width: "100%", bgcolor: '#1a313f', color: '#c0c0c0' }}>
             <TextField
               value={text}
@@ -116,17 +115,17 @@ export default function Generate() {
               variant="outlined"
               sx={{
                 mb: 2,
-                bgcolor: '#4c5e67', // --paynes-gray
-                input: { color: '#ffffff' }, // Set input text color
+                bgcolor: '#4c5e67', 
+                input: { color: '#ffffff' }, 
                 '& .MuiOutlinedInput-root': {
                   '& fieldset': {
-                    borderColor: '#1a313f', // --gunmetal-2
+                    borderColor: '#1a313f', 
                   },
                   '&:hover fieldset': {
-                    borderColor: '#334753', // --charcoal
+                    borderColor: '#334753', 
                   },
                   '&.Mui-focused fieldset': {
-                    borderColor: '#65747b', // --paynes-gray-2
+                    borderColor: '#65747b', 
                   },
                 },
               }}
@@ -197,7 +196,7 @@ export default function Generate() {
               ))}
             </Grid>
             <Box sx={{ mt: 6, display: 'flex', justifyContent: 'center' }}>
-              <Button variant="contained" color="primary" onClick={handleOpen} sx={{ bgcolor: '#000d15' }}>
+              <Button variant="contained" color="primary" onClick={handleOpen} sx={{ bgcolor: '#000d15', mb: 3 }}>
                 Save
               </Button>
             </Box>
@@ -207,7 +206,7 @@ export default function Generate() {
           <DialogTitle>Save Flashcards</DialogTitle>
           <DialogContent>
             <DialogContentText>
-              Please enter a name for your flashcards collection.
+              Please enter a name for your collection.
             </DialogContentText>
             <TextField
               autoFocus
@@ -219,17 +218,17 @@ export default function Generate() {
               onChange={(e) => setName(e.target.value)}
               variant="outlined"
               sx={{
-                bgcolor: '#4c5e67', // --paynes-gray
-                input: { color: '#ffffff' }, // Set input text color
+                bgcolor: '#4c5e67', 
+                input: { color: '#ffffff' }, 
                 '& .MuiOutlinedInput-root': {
                   '& fieldset': {
-                    borderColor: '#1a313f', // --gunmetal-2
+                    borderColor: '#1a313f', 
                   },
                   '&:hover fieldset': {
-                    borderColor: '#334753', // --charcoal
+                    borderColor: '#334753', 
                   },
                   '&.Mui-focused fieldset': {
-                    borderColor: '#65747b', // --paynes-gray-2
+                    borderColor: '#65747b', 
                   },
                 },
               }}
