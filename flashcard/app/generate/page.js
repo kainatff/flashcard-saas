@@ -1,173 +1,246 @@
-'use client'
-import { useUser } from "@clerk/nextjs"
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { doc, collection, setDoc, getDoc, writeBatch } from "firebase/firestore"
-import { db } from "@/firebase"
-import { Box, Button, Card, CardActionArea, CardContent, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, Paper, TextField, Typography } from "@mui/material"
+'use client';
+import { useUser } from "@clerk/nextjs";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { doc, collection, setDoc, getDoc, writeBatch } from "firebase/firestore";
+import { db } from "@/firebase";
+import { Box, Button, Card, CardActionArea, CardContent, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, Paper, TextField, Typography, createTheme, ThemeProvider } from "@mui/material";
 
-export default function Generate(){
-    const {isLoaded, isSignedIn, user} = useUser()
-    const [flashcards, setFlashcards] = useState([])
-    const [flipped, setFlipped] = useState([])
-    const [text, setText] = useState('')
-    const [name, setName] = useState('')
-    const [open, setOpen] = useState(false)
-    const router = useRouter()
+// Define your custom color palette theme
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#000000', // --black
+    },
+    secondary: {
+      main: '#001a2a', // --rich-black-3
+    },
+    text: {
+      primary: '#000d15', // --rich-black
+      secondary: '#334753', // --charcoal
+    },
+    background: {
+      default: '#65747b', // --paynes-gray-2
+    },
+  },
+  typography: {
+    h4: {
+      color: '#000d15', // --rich-black
+    },
+    h5: {
+      color: '#334753', // --charcoal
+    },
+  },
+});
 
-    const handleSubmit = async()=>{
-        fetch('api/generate',{
-            method:'POST',
-            body: text,
-        })
-        .then((res)=>res.json())
-        .then((data) => setFlashcards(data))
+export default function Generate() {
+  const { isLoaded, isSignedIn, user } = useUser();
+  const [flashcards, setFlashcards] = useState([]);
+  const [flipped, setFlipped] = useState([]);
+  const [text, setText] = useState('');
+  const [name, setName] = useState('');
+  const [open, setOpen] = useState(false);
+  const router = useRouter();
+
+  const handleSubmit = async () => {
+    fetch('api/generate', {
+      method: 'POST',
+      body: text,
+    })
+    .then((res) => res.json())
+    .then((data) => setFlashcards(data));
+  }
+
+  const handleCardClick = (id) => {
+    setFlipped((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  }
+
+  const handleOpen = () => {
+    setOpen(true);
+  }
+
+  const handleClose = () => {
+    setOpen(false);
+  }
+
+  const saveFlashcards = async () => {
+    if (!name) {
+      alert('Please enter a name');
+      return;
     }
-    const handleCardClick = (id) =>{
-        setFlipped((prev)=>({
-            ...prev,
-            [id]: !prev[id],
-        }))
+
+    const batch = writeBatch(db);
+    const userDocRef = doc(collection(db, 'users'));
+    const docSnap = await getDoc(userDocRef);
+
+    if (docSnap.exists()) {
+      const collections = docSnap.data().flashcards || [];
+      if (collections.find((f) => f.name === name)) {
+        alert('Flashcard collection with the same name already exists.');
+        return;
+      } else {
+        collections.push({ name });
+        batch.set(userDocRef, { flashcards: collections }, { merge: true });
+      }
+    } else {
+      batch.set(userDocRef, { flashcards: [{ name }] });
     }
-    const handleOpen=()=>{
-        setOpen(true)
-    }
-    const handleClose=()=>{
-        setOpen(false)
-    }
-    const saveFlashcards= async()=>{
-        if(!name){
-            alert('Please enter a name')
-            return
-        }
 
-        const batch = writeBatch(db)
-        const userDocRef = doc(collection(db,'users'))
-        const docSnap = await getDoc(userDocRef)
+    const colRef = collection(userDocRef, name);
+    flashcards.forEach((flashcard) => {
+      const cardDocRef = doc(colRef);
+      batch.set(cardDocRef, flashcard);
+    });
 
-        if (docSnap.exists()){
-            const collections = docSnap.data().flashcards || []
-            if (collection.find((f)=>f.name === name)){
-                alert('Flashcard collection with the same name already exists.')
-                return
-            }
-            else{
-                collections.push({name})
-                batch.set(userDocRef, {flashcards: collections},{merge:true})
-            }
-        }
-        else{
-            batch.set(userDocRef, {flashcards: [{name}]})
-        }
+    await batch.commit();
+    handleClose();
+    router.push('/flashcards');
+  }
 
-        const colRef = collection(userDocRef,name)
-        flashcards.forEach((flashcard)=>{
-            const cardDocRef = doc(colRef)
-            batch.set(cardDocRef, flashcard)
-        })
-
-        await batch.commit()
-        handleClose()
-        router.push('/flashcards')
-    }
-    return(
-        <Container maxWidth="md">
-            <Box sx={{mt:4,mb:6,display:'flex',flexDirection:'column',alignItems:'center'}}>
-                <Typography variant="h4">Generate Flashcards</Typography>
-                <Paper sx={{p:4, width: "100%"}}>
-                    <TextField value={text}
-                    onChange={(e)=>setText(e.target.value)}
-                    label="Enter Text"
-                    fullWidth
-                    multiline
-                    rows={4}
-                    variant="outlined"
-                    sx={{
-                      mb:2,  
-                    }}/>
-                    <Button variant="contained" color="primary" onClick={handleSubmit} fullWidth>
-                        Submit
-                    </Button>
-                </Paper>
-            </Box>
-            {flashcards.length > 0 && (
-                <Box sx={{mt: 4}}>
-                <Typography variant="h5">Flashcards Preview</Typography>
-                <Grid container spacing={3}>
-                    {flashcards.map((flashcard, index)=>(
-                        <Grid item xs={12} sm={6} md={4} key={index}>
-                            <Card>
-                                <CardActionArea
-                                  onClick={()=>{
-                                    handleCardClick(index)
-                                  }}
-                                >
-                                    <CardContent>
-                                        <Box sx={{perspective:'1000px',
-                                            '& > div': {
-                                                transition: 'transform 0.6s',
-                                                transformStyle: 'preserve-3d',
-                                                position:'relative',
-                                                width:'100%',
-                                                height: '400px',
-                                                boxShadow: '0 4px 8px 0 rgba(0,0,0,0.2)',
-                                                transform: flipped[index]? 'rotateY(180deg)': 'rotateY(0deg)',
-                                            },
-                                            '& > div > div': {
-                                                position: 'absolute',
-                                                width:'100%',
-                                                height: '100%',
-                                                backfaceVisibility: "hidden",
-                                                display: 'flex',
-                                                justifyContent: 'center',
-                                                alignItems: 'center',
-                                                padding: 2,
-                                                boxSizing: 'border-box'
-                                            },
-                                            '& > div > div:nth-of-type(2)':{
-
-                                            transform : 'rotateY(180deg)'
-                                            },
-                                         }}>
-                                            <div>
-                                            <div>
-                                                <Typography variant="h5" component="div">
-                                                    {flashcard.front}
-                                                </Typography>
-                                            </div>
-                                            <div>
-                                                <Typography variant="h5" component="div">
-                                                    {flashcard.back}
-                                                </Typography>
-                                            </div>
-                                            </div>
-                                            </Box>
-                                    </CardContent>
-                                </CardActionArea>
-                            </Card>
-                        </Grid>
-                    ))}
+  return (
+    <ThemeProvider theme={theme}>
+      <Container maxWidth="false" sx={{ bgcolor: '#65747b', minHeight: '130vh' }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <Typography variant="h4" sx={{ color: '#000d15' }}>Generate Flashcards</Typography>
+          <Paper sx={{ p: 4, width: "100%", bgcolor: '#1a313f', color: '#c0c0c0' }}>
+            <TextField
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              label="Enter Text"
+              fullWidth
+              multiline
+              rows={4}
+              variant="outlined"
+              sx={{
+                mb: 2,
+                bgcolor: '#4c5e67', // --paynes-gray
+                input: { color: '#ffffff' }, // Set input text color
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': {
+                    borderColor: '#1a313f', // --gunmetal-2
+                  },
+                  '&:hover fieldset': {
+                    borderColor: '#334753', // --charcoal
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: '#65747b', // --paynes-gray-2
+                  },
+                },
+              }}
+            />
+            <Button variant="contained" color="primary" onClick={handleSubmit} fullWidth sx={{ bgcolor: '#000000' }}>
+              Submit
+            </Button>
+          </Paper>
+        </Box>
+        {flashcards.length > 0 && (
+          <Box sx={{ mt: 4 }}>
+            <Typography variant="h5" sx={{ color: '#000d15' }}>Flashcards Preview</Typography>
+            <Grid container spacing={3}>
+              {flashcards.map((flashcard, index) => (
+                <Grid item xs={12} sm={6} md={4} key={index}>
+                  <Card sx={{ bgcolor: '#0d2635', color: '#000d15' }}>
+                    <CardActionArea
+                      onClick={() => {
+                        handleCardClick(index);
+                      }}
+                    >
+                      <CardContent>
+                        <Box sx={{
+                          perspective: '1000px',
+                          '& > div': {
+                            transition: 'transform 0.6s',
+                            transformStyle: 'preserve-3d',
+                            position: 'relative',
+                            width: '100%',
+                            height: '400px',
+                            boxShadow: '0 4px 8px 0 rgba(0,0,0,0.2)',
+                            transform: flipped[index] ? 'rotateY(180deg)' : 'rotateY(0deg)',
+                          },
+                          '& > div > div': {
+                            position: 'absolute',
+                            width: '100%',
+                            height: '100%',
+                            backfaceVisibility: "hidden",
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            padding: 2,
+                            boxSizing: 'border-box',
+                            bgcolor: '#1a313f', 
+                            color: '#000d15',
+                          },
+                          '& > div > div:nth-of-type(2)': {
+                            transform: 'rotateY(180deg)',
+                          },
+                        }}>
+                          <div>
+                            <div>
+                              <Typography variant="h5" component="div">
+                                {flashcard.front}
+                              </Typography>
+                            </div>
+                            <div>
+                              <Typography variant="h6" component="div">
+                                {flashcard.back}
+                              </Typography>
+                            </div>
+                          </div>
+                        </Box>
+                      </CardContent>
+                    </CardActionArea>
+                  </Card>
                 </Grid>
-                <Box sx={{mt: 6, display:'flex', justifyContent: 'center'}}>
-                    <Button variant="contained" color="primary" onClick={handleOpen}>
-                        Save
-                    </Button>
-                </Box>
-                </Box>
-                )}
-                <Dialog open={open} onClose={handleClose}>
-                    <DialogTitle>Save Flashcards</DialogTitle> 
-                    <DialogContent>
-                        <DialogContentText>
-                            Please enter a name for your flashcards collection.
-                        </DialogContentText>
-                        <TextField autoFocus margin="dense" label="Collection Name" type="text" fullWidth value={name} onChange={(e)=>setName(e.target.value)} variant="outlined"/>
-                    </DialogContent>
-                    <DialogActions>
-                        <Button onClick={handleClose}>Cancel</Button>
-                        <Button onClick={saveFlashcards}>Save</Button>
-                    </DialogActions>
-                </Dialog>
-        </Container>
-    )
+              ))}
+            </Grid>
+            <Box sx={{ mt: 6, display: 'flex', justifyContent: 'center' }}>
+              <Button variant="contained" color="primary" onClick={handleOpen} sx={{ bgcolor: '#000d15' }}>
+                Save
+              </Button>
+            </Box>
+          </Box>
+        )}
+        <Dialog open={open} onClose={handleClose}>
+          <DialogTitle>Save Flashcards</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Please enter a name for your flashcards collection.
+            </DialogContentText>
+            <TextField
+              autoFocus
+              margin="dense"
+              label="Collection Name"
+              type="text"
+              fullWidth
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              variant="outlined"
+              sx={{
+                bgcolor: '#4c5e67', // --paynes-gray
+                input: { color: '#ffffff' }, // Set input text color
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': {
+                    borderColor: '#1a313f', // --gunmetal-2
+                  },
+                  '&:hover fieldset': {
+                    borderColor: '#334753', // --charcoal
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: '#65747b', // --paynes-gray-2
+                  },
+                },
+              }}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose} sx={{ color: '#001a2a' }}>Cancel</Button>
+            <Button onClick={saveFlashcards} sx={{ color: '#001a2a' }}>Save</Button>
+          </DialogActions>
+        </Dialog>
+      </Container>
+    </ThemeProvider>
+  );
 }

@@ -97,28 +97,39 @@ const PricingSection = () => {
     <Grid container spacing={4} justifyContent="center" sx={{ mt: 1 }}>
       {pricingPlans.map((plan, index) => (
         <Grid item xs={12} sm={6} md={4} key={index}>
-          <Card sx={{ maxWidth: 345, textAlign: 'center', bgcolor: '#0d2635', color: '#fff' }}>
-            <CardContent>
+          <Card sx={{ 
+            maxWidth: 345, 
+            textAlign: 'center', 
+            bgcolor: '#0d2635', 
+            color: '#fff', 
+            minHeight: '420px', 
+            display: 'flex', 
+            flexDirection: 'column', 
+            justifyContent: 'space-between' 
+          }}>
+            <CardContent sx={{ flexGrow: 1 }}>
               <Typography gutterBottom variant="h5" component="div">
                 {plan.title}
               </Typography>
               <Typography variant="h4" color="primary" gutterBottom>
                 {plan.price}
               </Typography>
-              <Typography variant="body2" color="text.secondary" gutterBottom>
+              <Typography variant="body1" color="text.secondary" gutterBottom>
                 {plan.description}
               </Typography>
               <Stack spacing={1} sx={{ mt: 2 }}>
                 {plan.features.map((feature, i) => (
-                  <Typography variant="body2" color="text.secondary" key={i}>
+                  <Typography variant="body1" color="text.secondary" key={i}>
                     {feature}
                   </Typography>
                 ))}
               </Stack>
+            </CardContent>
+            <Box sx={{ pb: 2 }}> {/* Ensure button is at the bottom */}
               <Button variant="contained" color="primary" sx={{ mt: 3 }}>
                 Choose Plan
               </Button>
-            </CardContent>
+            </Box>
           </Card>
         </Grid>
       ))}
