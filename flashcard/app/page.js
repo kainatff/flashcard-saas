@@ -138,9 +138,6 @@ export default function Home() {
         <Button variant="contained" color="primary" sx={{ mt: 2, mr: 2 }} href="/generate">
           Get Started
         </Button>
-        <Button variant="outlined" color="primary" sx={{ mt: 2 }}>
-          Learn More
-        </Button>
       </Box>
       <Box sx={{ my: 8, textAlign: 'center' }}>
         <Typography variant="h4" component="h2" gutterBottom>
