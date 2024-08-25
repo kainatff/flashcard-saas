@@ -2,6 +2,8 @@
 import Image from "next/image";
 import getStripe from "@/utils/get-stripe";
 import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
+import CssBaseline from "@mui/material/CssBaseline";
+import { GlobalStyles } from "@mui/material";
 import Head from 'next/head';
 import {
   Box,
@@ -92,7 +94,7 @@ const FeatureSection = () => {
   );
 };
 
-const PricingSection = () => {
+const PricingSection = ({ handleSubmit }) => {
   return (
     <Grid container spacing={4} justifyContent="center" sx={{ mt: 1 }}>
       {pricingPlans.map((plan, index) => (
@@ -126,7 +128,7 @@ const PricingSection = () => {
               </Stack>
             </CardContent>
             <Box sx={{ pb: 2 }}> {/* Ensure button is at the bottom */}
-              <Button variant="contained" color="primary" sx={{ mt: 3 }}>
+              <Button variant="contained" color="primary" sx={{ mt: 3 }} onClick= {handleSubmit}>
                 Choose Plan
               </Button>
             </Box>
@@ -138,12 +140,42 @@ const PricingSection = () => {
 };
 
 export default function Home() {
+
+  const handleSubmit = async () => {
+    const checkoutSession = await fetch('/api/checkout_sessions', {
+      method: 'POST',
+      headers: { origin: 'http://localhost:3000' },
+    })
+    const checkoutSessionJson = await checkoutSession.json()
+
+    if (checkoutSession.statusCode === 500) {
+      console.error(checkoutSessionJson.message)
+      return
+    }
+  
+    const stripe = await getStripe()
+    const {error} = await stripe.redirectToCheckout({
+      sessionId: checkoutSessionJson.id,
+    })
+  
+    if (error) {
+      console.warn(error.message)
+    }
+  }
+
   return (
     <ThemeProvider theme={theme}>
-      <Container sx={{ bgcolor: '#65747b', minHeight: '100vh' }}>
+      <CssBaseline />
+      <GlobalStyles
+        styles={{
+          html: { height: '100%' },
+          body: { height: '100%', margin: 0, padding: 0, backgroundColor: '#65747b' },
+        }}
+      />
+      <Container sx={{ bgcolor: '#65747b', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
         <Head>
           <title>Flashcard SaaS</title>
-          <meta name="description" content="Create flashcard from your text" />
+          <meta name="description" content="Create flashcards from your text" />
         </Head>
         <AppBar position="static" sx={{ bgcolor: '#001a2a' }}>
           <Toolbar>
@@ -180,7 +212,7 @@ export default function Home() {
           <Typography variant="h4" component="h2" gutterBottom >
             Pricing
           </Typography>
-          <PricingSection />
+          <PricingSection handleSubmit={handleSubmit} />
         </Box>
       </Container>
     </ThemeProvider>
