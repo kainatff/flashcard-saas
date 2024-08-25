@@ -1,7 +1,7 @@
 'use client';
 import Image from "next/image";
 import getStripe from "@/utils/get-stripe";
-import { SignedIn, SignedOut, UserButton, useauth } from '@clerk/nextjs';
+import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
 import Head from 'next/head';
 import {
   Box,
@@ -10,24 +10,43 @@ import {
   TextField,
   Typography,
   AppBar, Container, Toolbar,
-  Grid, Card, CardContent, CardMedia
+  Grid, Card, CardContent, CardMedia,
+  createTheme, ThemeProvider
 } from "@mui/material";
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#000000', 
+    },
+    secondary: {
+      main: '#001d36', 
+    },
+    text: {
+      primary: '#000d15', 
+      secondary: '#334753', 
+    },
+    background: {
+      default: '#001420', 
+    },
+  },
+});
 
 const features = [
   {
+    title: 'Easy Text Input',
+    description: 'Seamlessly input text to generate flashcards without hassle.',
+    image: 'input.jpg',
+  },
+  {
     title: 'Smart Flashcards',
-    description: 'AI-generated flashcards based on your study material to enhance learning.',
-    image: 'path/to/flashcards-image.jpg',
+    description: 'AI-generated flashcards tailored to your study material for effective learning.',
+    image: 'cards.jpg',
   },
   {
-    title: 'Progress Tracking',
-    description: 'Track your learning progress with detailed analytics and insights.',
-    image: 'path/to/progress-tracking-image.jpg', 
-  },
-  {
-    title: 'Customizable Study Plans',
-    description: 'Create personalized study plans that adapt to your learning pace.',
-    image: 'path/to/customizable-study-plans-image.jpg', 
+    title: 'Accessible Anywhere',
+    description: 'Access your flashcards and study plans from any device, anywhere.',
+    image: 'access.jpg',
   },
 ];
 
@@ -48,10 +67,10 @@ const pricingPlans = [
 
 const FeatureSection = () => {
   return (
-    <Grid container spacing={4} sx={{ mt: 4 }}>
+    <Grid container spacing={4} sx={{ mt: 1 }}>
       {features.map((feature, index) => (
         <Grid item xs={12} sm={6} md={4} key={index}>
-          <Card sx={{ maxWidth: 345 }}>
+          <Card sx={{ maxWidth: 345, bgcolor: '#0d2635', color: '#fff' }}>
             <CardMedia
               component="img"
               height="140"
@@ -59,10 +78,10 @@ const FeatureSection = () => {
               alt={feature.title}
             />
             <CardContent>
-              <Typography gutterBottom variant="h5" component="div">
+              <Typography gutterBottom variant="h5" component="div" sx={{ color: '#fff' }}>
                 {feature.title}
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" color="#c0c0c0">
                 {feature.description}
               </Typography>
             </CardContent>
@@ -75,10 +94,10 @@ const FeatureSection = () => {
 
 const PricingSection = () => {
   return (
-    <Grid container spacing={4} justifyContent="center" sx={{ mt: 4 }}>
+    <Grid container spacing={4} justifyContent="center" sx={{ mt: 1 }}>
       {pricingPlans.map((plan, index) => (
         <Grid item xs={12} sm={6} md={4} key={index}>
-          <Card sx={{ maxWidth: 345, textAlign: 'center' }}>
+          <Card sx={{ maxWidth: 345, textAlign: 'center', bgcolor: '#0d2635', color: '#fff' }}>
             <CardContent>
               <Typography gutterBottom variant="h5" component="div">
                 {plan.title}
@@ -109,50 +128,50 @@ const PricingSection = () => {
 
 export default function Home() {
   return (
-    <Container>
-      <Head>
-        <title>Flashcard SaaS</title>
-        <meta name="description" content="Create flashcard from your text" />
-      </Head>
-      <AppBar position="static">
-        <Toolbar>
-          <Typography variant="h6" style={{ flexGrow: 1 }}>
-            Flashcard SaaS
+    <ThemeProvider theme={theme}>
+      <Container sx={{ bgcolor: '#65747b', minHeight: '100vh' }}>
+        <Head>
+          <title>Flashcard SaaS</title>
+          <meta name="description" content="Create flashcard from your text" />
+        </Head>
+        <AppBar position="static" sx={{ bgcolor: '#001a2a' }}>
+          <Toolbar>
+            <Typography variant="h6" sx={{ flexGrow: 1 }}>
+              Flashcard SaaS
+            </Typography>
+            <SignedOut>
+              <Button color="inherit" href="/sign-in">Login</Button>
+              <Button color="inherit" href="/sign-up">Sign Up</Button>
+            </SignedOut>
+            <SignedIn>
+              <UserButton />
+            </SignedIn>
+          </Toolbar>
+        </AppBar>
+        <Box sx={{ textAlign: 'center', my: 8 }}>
+          <Typography variant="h2" component="h1" gutterBottom>
+            Welcome to Flashcard SaaS
           </Typography>
-          <SignedOut>
-            <Button color="inherit" href="/sign-in">Login</Button>
-            <Button color="inherit" href="/sign-up">Sign Up</Button>
-          </SignedOut>
-          <SignedIn>
-            <UserButton />
-          </SignedIn>
-        </Toolbar>
-      </AppBar>
-      <Box sx={{ textAlign: 'center', my: 4 }}>
-        <Typography variant="h2" component="h1" gutterBottom>
-          Welcome to Flashcard SaaS
-        </Typography>
-        <Typography variant="h5" component="h2" gutterBottom>
-          The easiest way to create flashcards from your text.
-        </Typography>
-        <Button variant="contained" color="primary" sx={{ mt: 2, mr: 2 }} href="/generate">
-          Get Started
-        </Button>
-      </Box>
-      <Box sx={{ my: 8, textAlign: 'center' }}>
-        <Typography variant="h4" component="h2" gutterBottom>
-          Features
-        </Typography>
-        {/* Use the FeatureSection component here */}
-        <FeatureSection />
-      </Box>
-      <Box sx={{ my: 8, textAlign: 'center' }}>
-        <Typography variant="h4" component="h2" gutterBottom>
-          Pricing
-        </Typography>
-        {/* Use the PricingSection component here */}
-        <PricingSection />
-      </Box>
-    </Container>
+          <Typography variant="h5" component="h2" gutterBottom>
+            The easiest way to create flashcards from your text.
+          </Typography>
+          <Button variant="contained" color="primary" sx={{ mt: 2, mr: 2 }} href="/generate">
+            Get Started
+          </Button>
+        </Box>
+        <Box sx={{ my: 6, textAlign: 'center' }}>
+          <Typography variant="h4" component="h2" gutterBottom>
+            Features
+          </Typography>
+          <FeatureSection />
+        </Box>
+        <Box sx={{ my: 6, textAlign: 'center' }}>
+          <Typography variant="h4" component="h2" gutterBottom>
+            Pricing
+          </Typography>
+          <PricingSection />
+        </Box>
+      </Container>
+    </ThemeProvider>
   );
 }
