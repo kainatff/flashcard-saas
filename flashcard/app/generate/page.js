@@ -101,7 +101,7 @@ export default function Generate() {
 
   return (
     <ThemeProvider theme={theme}>
-      <Container maxWidth="false" sx={{ bgcolor: '#65747b', minHeight: "false", }}>
+      <Container maxWidth="false" sx={{ bgcolor: '#65747b', minHeight: '130vh' }}>
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <Typography variant="h4" sx={{ color: '#000d15', mt: 4 }}>Generate Flashcards</Typography>
           <Paper sx={{ p: 4, width: "100%", bgcolor: '#1a313f', color: '#c0c0c0' }}>
@@ -206,7 +206,7 @@ export default function Generate() {
           <DialogTitle>Save Flashcards</DialogTitle>
           <DialogContent>
             <DialogContentText>
-              Please enter a name for your collection.
+              Please enter a name for your flashcards collection.
             </DialogContentText>
             <TextField
               autoFocus
