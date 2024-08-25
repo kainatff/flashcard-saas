@@ -1,11 +1,6 @@
 import { NextResponse } from "next/server";
-const { GoogleGenerativeAI } = require ('@google/generative-ai');
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const apiKey = process.env.API_KEY;
-const genAI = new GoogleGenerativeAI(apiKey);
-const MODEL_NAME = "gemini-1.5-flash";
-
-export async function POST(request) {
 const systemPrompt = `
 You are a flashcard generator.
 You should generate concise and effective flashcards based on the given topic or content. Follow these guidelines:
@@ -20,6 +15,8 @@ You should generate concise and effective flashcards based on the given topic or
 8. Consistency: Maintain a consistent style and format across all flashcards to make them easy to review and use.
 9. Customization: Be open to adjusting the flashcards based on user feedback or specific preferences they might have.
 10. Always generate 9 flashcards unless the user specifies the number of flashcards.
+11. Be prepared to create flashcards on a wide range of subjects, from academic topics to practical skills.
+12. For subjects involving formulas or equations, present them clearly and include brief explanations if necessary.
 
 Remember the goal is to facilitate effective learning and retention of information through these flashcards.
 
@@ -31,21 +28,30 @@ Return in the following JSON format
      "back": str
     }
 ]
-}`
-try {
-  const { prompt } = await req.json();
+}`;
+const genAI = new GoogleGenerativeAI(process.env.API_KEY);
 
-  const combinedPrompt = `${systemPrompt}\n\nUser input:\n${prompt}`;
+export async function POST(req) {
+  const data = await req.text();
+  let model = genAI.getGenerativeModel({
+    model: "gemini-1.5-flash",
+    systemInstruction: systemPrompt,
+    generationConfig: { responseMimeType: "application/json" },
+  });
 
-  const response = await genAI
-      .getGenerativeModel({ model: MODEL_NAME })
-      .generateContent({
-          contents: [{ parts: [{ text: combinedPrompt }] }]
-      });
+  let result = await model.generateContent({
+    contents: [
+      {
+        role: "model",
+        parts: [{ text: systemPrompt }],
+      },
+      {
+        role: "user",
+        parts: [{ text: data }],
+      },
+    ],
+  });
 
-  return NextResponse.json(response);
-} catch (error) {
-  console.error('Error generating flashcards:', error);
-  return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
-}
+  const flashcards = JSON.parse(result.response.text());
+  return NextResponse.json(flashcards.flashcards);
 }
