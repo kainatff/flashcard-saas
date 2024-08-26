@@ -9,7 +9,7 @@ export default function SignInPage() {
             <AppBar position="static" sx={{ bgcolor: '#001a2a' }}>
                 <Toolbar>
                     <Typography variant="h6" sx={{ flexGrow: 1 }}>
-                        Flashcard SaaS
+                        FlashStudyX
                     </Typography>
                     <Button color="inherit">
                         <Link href="/sign-in" passHref>
