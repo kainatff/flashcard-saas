@@ -173,14 +173,14 @@ export default function Home() {
         }}
       />
       <Head>
-        <title>Flashcard SaaS</title>
+        <title> FlashStudyX </title>
         <meta name="description" content="Create flashcards from your text" />
       </Head>
       
       <AppBar position="static" sx={{ bgcolor: '#001a2a' }}>
         <Toolbar>
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            Flashcard SaaS
+            FlashStudyX
           </Typography>
           <SignedOut>
             <Button color="inherit" href="/sign-in">Login</Button>
@@ -195,7 +195,7 @@ export default function Home() {
       <Container sx={{ bgcolor: '#65747b', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
         <Box sx={{ textAlign: 'center', my: 8 }}>
           <Typography variant="h2" component="h1" gutterBottom>
-            Welcome to Flashcard SaaS
+            Welcome to FlashStudyX
           </Typography>
           <Typography variant="h5" component="h2" gutterBottom>
             The easiest way to create flashcards from your text.
