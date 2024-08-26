@@ -163,7 +163,7 @@ export default function Home() {
     }
   }
 
-  return (
+ return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <GlobalStyles
@@ -172,25 +172,27 @@ export default function Home() {
           body: { height: '100%', margin: 0, padding: 0, backgroundColor: '#65747b' },
         }}
       />
+      <Head>
+        <title>Flashcard SaaS</title>
+        <meta name="description" content="Create flashcards from your text" />
+      </Head>
+      
+      <AppBar position="static" sx={{ bgcolor: '#001a2a' }}>
+        <Toolbar>
+          <Typography variant="h6" sx={{ flexGrow: 1 }}>
+            Flashcard SaaS
+          </Typography>
+          <SignedOut>
+            <Button color="inherit" href="/sign-in">Login</Button>
+            <Button color="inherit" href="/sign-up">Sign Up</Button>
+          </SignedOut>
+          <SignedIn>
+            <UserButton />
+          </SignedIn>
+        </Toolbar>
+      </AppBar>
+
       <Container sx={{ bgcolor: '#65747b', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-        <Head>
-          <title>Flashcard SaaS</title>
-          <meta name="description" content="Create flashcards from your text" />
-        </Head>
-        <AppBar position="static" sx={{ bgcolor: '#001a2a' }}>
-          <Toolbar>
-            <Typography variant="h6" sx={{ flexGrow: 1 }}>
-              Flashcard SaaS
-            </Typography>
-            <SignedOut>
-              <Button color="inherit" href="/sign-in">Login</Button>
-              <Button color="inherit" href="/sign-up">Sign Up</Button>
-            </SignedOut>
-            <SignedIn>
-              <UserButton />
-            </SignedIn>
-          </Toolbar>
-        </AppBar>
         <Box sx={{ textAlign: 'center', my: 8 }}>
           <Typography variant="h2" component="h1" gutterBottom>
             Welcome to Flashcard SaaS
